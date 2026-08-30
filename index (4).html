@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Content Opportunity Scoring | FlyRank ML Internship</title>
+<style>
+body{font-family:Arial,Helvetica,sans-serif;max-width:900px;margin:0 auto;padding:40px 22px;line-height:1.65;color:#17202a;background:#f7f8fa}
+main{background:#fff;padding:35px;border-radius:14px} h1{line-height:1.15} h2{margin-top:40px;border-bottom:1px solid #ddd;padding-bottom:8px}
+.kicker{color:#2457a6;font-weight:bold;text-transform:uppercase;letter-spacing:.08em;font-size:13px}
+.card{background:#f1f4f7;padding:20px;border-radius:10px}.note{border-left:4px solid #2457a6;padding:12px 16px;background:#f1f5fa}
+table{width:100%;border-collapse:collapse;margin:18px 0}th,td{border:1px solid #ddd;padding:11px;text-align:left;vertical-align:top}th{background:#eef1f4}
+code{background:#eef1f4;padding:2px 5px;border-radius:4px}a{color:#2457a6}
+.bar{height:20px;background:#d9dee5;border-radius:5px;overflow:hidden}.fill{height:100%;background:#5279ad}
+.row{display:grid;grid-template-columns:170px 1fr 55px;gap:10px;align-items:center;margin:12px 0}
+footer{border-top:1px solid #ddd;margin-top:45px;padding-top:20px;color:#65717d}
+</style>
+</head>
+<body><main>
+<header><div class="kicker">FlyRank ML Internship · Research Artifact</div>
+<h1>Content Opportunity Scoring</h1>
+<p>A decision-support approach for prioritizing pages for human content-refresh review.</p></header>
+
+<h2>Abstract</h2>
+<div class="card">
+<p><strong>Question:</strong> Can search and content signals be used to prioritize web pages that may deserve human review for a possible content refresh?</p>
+<p><strong>Method:</strong> I framed the problem as a content-opportunity scoring task, using search-performance and content signals and comparing a transparent baseline with machine-learning models.</p>
+<p><strong>Validation:</strong> The model audit emphasized an honest grouped/time-aware validation design, feature-leakage checks, and cautious interpretation of a future-performance proxy label.</p>
+<p><strong>Result:</strong> In the observed ML comparison, Logistic Regression achieved an average precision of <strong>0.227</strong>, compared with <strong>0.216</strong> for Random Forest.</p>
+<p><strong>Interpretation:</strong> The result supports using the score as a directional prioritization signal and decision aid, not as proof that a refresh will improve rankings, traffic, or SEO performance.</p>
+</div>
+
+<h2>1. Introduction / Problem Statement</h2>
+<p>Content teams can have many pages that could potentially be reviewed, but reviewing every page with the same priority is inefficient. This project asks whether available search and content signals can help identify which pages should be looked at first.</p>
+<p>The practical output is a ranked review queue. A high score means a page deserves earlier human attention; it does not mean that the page definitely needs a refresh.</p>
+<div class="note"><strong>Scope:</strong> This is decision support. It is not an automated content editor and it is not a model of Google's ranking algorithm.</div>
+
+<h2>2. Data</h2>
+<p>The work uses the FlyRank ML Internship dataset and its search/content-performance signals. The analysis is deliberately described at a public-safe level.</p>
+<ul><li>Impressions, clicks, CTR, and average position.</li><li>Content age/staleness and days since last update.</li><li>Word count and search-demand context.</li><li>Changes in search performance.</li></ul>
+<h3>What was excluded</h3>
+<p>Client names, domains and private URLs, raw private queries, credentials, and other identifying production information are excluded from this public artifact.</p>
+<h3>Release and time window</h3>
+<p>The analysis follows the approved FlyRank internship dataset/release and the analysis windows defined in the supporting notebooks. Private client-level identifiers and queries are intentionally not reproduced here.</p>
+
+<h2>3. Methodology</h2>
+<h3>Prediction / ranking objective</h3>
+<p>The supervised task uses a future-decline proxy: whether a page's later impressions fall below a defined fraction of its current-period impressions. This is a measurable future outcome, not a causal label for whether refreshing a page would work.</p>
+<h3>Features</h3>
+<p>Candidate features included content age/staleness, days since last update, impressions, average position, CTR, word count, search-volume context, and recent search-performance signals. Features were required to be knowable at the decision moment.</p>
+<h3>Baseline and models</h3>
+<p>A transparent Week-4 baseline rule provided the simple reference approach. Week 5 compared it with Logistic Regression and Random Forest. Logistic Regression was retained as the preferred ML model because it had the higher observed validation average precision.</p>
+<h3>Validation and leakage</h3>
+<p>The model was audited using a more honest split, including grouping by client where appropriate, reducing the chance that the same client's patterns appear across both training and validation data. Future-looking or label-derived variables are leakage risks and should not be prediction features.</p>
+
+<h2>4. Results</h2>
+<table><tr><th>Model</th><th>Average precision</th><th>Interpretation</th></tr>
+<tr><td>Logistic Regression</td><td><strong>0.227</strong></td><td>Higher observed AP in this comparison.</td></tr>
+<tr><td>Random Forest</td><td><strong>0.216</strong></td><td>Slightly lower observed AP in this comparison.</td></tr></table>
+<div class="card">
+<div class="row"><span>Logistic Regression</span><div class="bar"><div class="fill" style="width:100%"></div></div><strong>0.227</strong></div>
+<div class="row"><span>Random Forest</span><div class="bar"><div class="fill" style="width:95.2%"></div></div><strong>0.216</strong></div>
+</div>
+<p>The difference is small (0.011 AP), so it is best described as a slight measured advantage rather than a decisive or universal win. The baseline remains the practical reference point; its exact metric should be taken from the committed validation receipt rather than invented on this public page.</p>
+
+<h2>5. Limitations & Honest Framing</h2>
+<ul>
+<li>The score is a directional prioritization signal, not a guarantee of future decline.</li>
+<li>The future-decline proxy is not a causal measure of refresh success.</li>
+<li>A high score does not prove that editing a page will increase rankings, clicks, or traffic.</li>
+<li>Reason codes identify measurable review cues; they are not causal explanations.</li>
+<li>Validation results apply to the tested data and split and are not universal performance guarantees.</li>
+<li>Seasonality, search demand, competition, algorithm changes, and measurement noise can affect observed performance.</li>
+<li>Editorial, legal, strategic, and business context still requires human judgment.</li>
+</ul>
+
+<h2>6. Ranked Recommendations</h2>
+<p>The validated output should become a human-reviewed content action playbook.</p>
+<table><tr><th>Signal / archetype</th><th>Recommended action</th><th>Reason codes</th></tr>
+<tr><td>Stale + visible + slipping</td><td>Review first for a possible refresh/update.</td><td><code>STALE</code>, <code>VISIBLE_VOLUME</code>, <code>POSITION_SLIP</code></td></tr>
+<tr><td>Visible + slipping</td><td>Investigate search intent, content fit, and recent performance.</td><td><code>VISIBLE_VOLUME</code>, <code>POSITION_SLIP</code></td></tr>
+<tr><td>Stale + stable</td><td>Monitor and review when useful.</td><td><code>STALE</code></td></tr>
+<tr><td>Low-volume evidence</td><td>Deprioritize or investigate manually.</td><td><code>LOW_SEARCH_VOLUME</code></td></tr>
+<tr><td>Healthy performance</td><td>Protect and monitor rather than automatically refreshing.</td><td><code>NO_REFRESH_SIGNAL</code></td></tr></table>
+<h3>Human-review boundary</h3>
+<p>The system should not automatically rewrite, publish, delete, merge, prune, or otherwise change content. It should not claim that an action will increase rankings or traffic. A human should review the page, evidence quality, search intent, and business context before any change.</p>
+
+<h2>7. Reproducibility</h2>
+<p>The supporting analysis is organized in the GitHub repository under <code>work/</code>. Key artifacts include:</p>
+<ul><li><code>work/notebooks/w06_validation_audit.ipynb</code></li><li><code>work/notebooks/w07_action_playbook.ipynb</code></li><li><code>work/notebooks/capstone.ipynb</code></li><li><code>work/figures/</code></li><li><code>work/outputs/</code></li></ul>
+<p>The repository is the source of truth for the executable analysis; this page is the public-facing research summary.</p>
+
+<h2>8. Acknowledgments & Data Credit</h2>
+<p><strong>Built on the FlyRank ML Internship dataset.</strong></p>
+<p>The dataset and project context were provided through the FlyRank ML Internship program. Data credit: <a href="https://flyrank.ai" target="_blank" rel="noopener">flyrank.ai</a>.</p>
+
+<footer>Research artifact prepared as part of the FlyRank Machine Learning Internship. Public-safe framing is intentional: observed results are reported as measured evidence and the model is presented as decision support.</footer>
+</main></body></html>
